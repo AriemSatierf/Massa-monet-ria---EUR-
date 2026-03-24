@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Massa Monetária · Zona Euro</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#08090b;
+  --s1:#0f1014;
+  --s2:#14161b;
+  --border:#22252e;
+  --border2:#2e3240;
+  --text:#e2e4ec;
+  --muted:#5c6070;
+  --muted2:#3a3d4a;
+  --m2:#f0c040;
+  --m3:#40c8f0;
+  --red:#f05050;
+  --green:#50d080;
+  --accent:#f0c040;
+}
+
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Syne',sans-serif;
+  min-height:100vh;
+  padding-bottom:4rem;
+}
+
+/* ── HEADER ── */
+.header{
+  background:var(--s1);
+  border-bottom:1px solid var(--border);
+  padding:1rem 1.2rem .8rem;
+  position:sticky;top:0;z-index:100;
+}
+.header-top{display:flex;align-items:baseline;justify-content:space-between;gap:.5rem}
+.logo{
+  font-family:'Instrument Serif',serif;
+  font-size:1.5rem;font-style:italic;
+  letter-spacing:-.02em;line-height:1;
+}
+.logo b{color:var(--m2);font-style:normal}
+.header-sub{font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:.25rem}
+
+/* ── TABS ── */
+.tabs{
+  display:flex;gap:.3rem;
+  padding:.8rem 1.2rem 0;
+  border-bottom:1px solid var(--border);
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.tab{
+  background:none;border:none;
+  color:var(--muted);font-family:'Syne',sans-serif;
+  font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:.5rem .9rem;cursor:pointer;
+  border-bottom:2px solid transparent;
+  white-space:nowrap;
+  transition:color .2s,border-color .2s;
+}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab:hover:not(.active){color:var(--text)}
+
+/* ── SECTIONS ── */
+.section{display:none;padding:1.2rem}
+.section.active{display:block}
+
+/* ── CARDS ── */
+.card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:6px;padding:1.1rem;margin-bottom:.8rem;
+}
+.card-label{
+  font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:.5rem;
+}
+.big{
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(1.8rem,7vw,2.8rem);
+  line-height:1;letter-spacing:-.02em;
+}
+.tag{
+  display:inline-block;
+  font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;
+  padding:.2rem .5rem;border-radius:3px;margin-left:.4rem;
+  vertical-align:middle;font-family:'Syne',sans-serif;
+}
+.tag-m2{background:rgba(240,192,64,.15);color:var(--m2)}
+.tag-m3{background:rgba(64,200,240,.15);color:var(--m3)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem}
+
+.stat-label{font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem}
+.stat-val{font-size:1.05rem;font-family:'Instrument Serif',serif;font-weight:400}
+.up{color:var(--red)}   /* monetary expansion = bad = red */
+.down{color:var(--green)}
+.neu{color:var(--muted)}
+
+/* ── CHART ── */
+.chart-container{position:relative;width:100%;margin:.6rem 0}
+canvas{display:block;width:100%!important}
+
+.chart-legend{
+  display:flex;gap:1rem;flex-wrap:wrap;
+  font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:.6rem;
+}
+.legend-dot{
+  width:8px;height:8px;border-radius:50%;
+  display:inline-block;margin-right:.3rem;vertical-align:middle;
+}
+
+/* ── PERIOD RANGE ── */
+.range-row{display:flex;gap:.5rem;align-items:center;margin-bottom:.8rem;flex-wrap:wrap}
+.range-label{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+select{
+  background:var(--s2);border:1px solid var(--border2);
+  color:var(--text);font-family:'Syne',sans-serif;
+  font-size:.7rem;padding:.35rem .5rem;border-radius:4px;
+  -webkit-appearance:none;flex:1;min-width:80px;
+}
+
+/* ── COMPARATOR ── */
+.comp-result{
+  background:var(--s2);border:1px solid var(--border2);
+  border-radius:6px;padding:1rem;margin-top:.8rem;
+}
+.comp-row{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:.4rem 0;border-bottom:1px solid var(--border);
+  font-size:.78rem;
+}
+.comp-row:last-child{border-bottom:none}
+.comp-key{color:var(--muted);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase}
+.comp-val{font-family:'Instrument Serif',serif;font-size:1rem}
+
+/* ── INFLATION CALC ── */
+.infl-block{
+  background:var(--s2);border:1px solid var(--border2);
+  border-radius:6px;padding:1rem;margin-top:.6rem;
+}
+.infl-big{
+  font-family:'Instrument Serif',serif;
+  font-size:2.2rem;line-height:1;
+  color:var(--red);
+}
+.infl-explain{
+  font-size:.65rem;color:var(--muted);
+  line-height:1.7;margin-top:.5rem;
+}
+.infl-explain strong{color:var(--text)}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:.7rem}
+.tbl th{
+  font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);padding:.4rem .3rem;border-bottom:1px solid var(--border2);
+  text-align:left;
+}
+.tbl th:not(:first-child){text-align:right}
+.tbl td{padding:.38rem .3rem;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl td:not(:first-child){text-align:right;font-family:'Instrument Serif',serif;font-size:.8rem}
+.tbl tr:last-child td{border-bottom:none}
+.tbl .period{color:var(--muted);font-size:.63rem}
+.bar-cell{width:60px}
+.bar-t{height:4px;background:var(--border2);border-radius:2px}
+.bar-f{height:100%;border-radius:2px}
+
+/* ── STATUS ── */
+.status{
+  display:flex;align-items:center;gap:.5rem;
+  font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin-top:1rem;flex-wrap:wrap;
+}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.dot.live{background:var(--green);animation:blink 2s infinite}
+.dot.loading{background:var(--m2);animation:blink .6s infinite}
+.dot.err{background:var(--red)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.btn{
+  background:var(--s2);border:1px solid var(--border2);
+  color:var(--muted);font-family:'Syne',sans-serif;
+  font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:.35rem .8rem;cursor:pointer;border-radius:4px;
+  transition:all .2s;
+}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+.skel{
+  display:inline-block;
+  background:linear-gradient(90deg,var(--border) 25%,var(--s2) 50%,var(--border) 75%);
+  background-size:200% 100%;
+  animation:shim 1.4s infinite;
+  border-radius:3px;
+}
+@keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.info-icon{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:13px;height:13px;border-radius:50%;
+  background:var(--border2);color:var(--muted);
+  font-size:.5rem;font-style:normal;cursor:pointer;
+  flex-shrink:0;line-height:1;
+  transition:background .2s,color .2s;
+}
+.info-icon:hover{background:var(--accent);color:var(--bg)}
+
+.info-tip{
+  display:none;
+  position:absolute;left:0;right:0;top:100%;
+  background:var(--s2);border:1px solid var(--border2);
+  border-radius:5px;padding:.7rem .8rem;
+  font-size:.62rem;line-height:1.6;color:var(--text);
+  z-index:50;margin-top:.3rem;
+  box-shadow:0 4px 16px rgba(0,0,0,.5);
+}
+.info-tip.open{display:block}
+.info-tip strong{color:var(--accent);display:block;margin-bottom:.25rem}
+
+.footnote{
+  font-size:.55rem;color:var(--muted);line-height:1.7;
+  border-top:1px solid var(--border);padding-top:.8rem;margin-top:1.2rem;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="logo"><b>M2·M3</b> Zona Euro</div>
+      <div class="header-sub">Banco Central Europeu · Agregados Monetários</div>
+    </div>
+    <button class="btn" id="btn-refresh" onclick="loadAll()">↻ Atualizar</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('dashboard')">Dashboard</button>
+  <button class="tab" onclick="showTab('grafico')">Gráfico</button>
+  <button class="tab" onclick="showTab('comparador')">Comparador</button>
+  <button class="tab" onclick="showTab('inflacao')">Inflação</button>
+  <button class="tab" onclick="showTab('historico')">Histórico</button>
+  <button class="tab" onclick="showTab('emissao')">Emissão</button>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div class="section active" id="tab-dashboard">
+
+  <div class="card">
+    <div class="card-label">M3 · Referência BCE <span class="tag tag-m3">principal</span></div>
+    <div class="big" id="d-m3-val"><span class="skel" style="width:9rem;height:2rem"></span></div>
+    <div style="font-size:.62rem;color:var(--muted);margin-top:.3rem" id="d-m3-period"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">M2 · Indicador de Inflação <span class="tag tag-m2">análise</span></div>
+    <div class="big" id="d-m2-val"><span class="skel" style="width:9rem;height:2rem"></span></div>
+    <div style="font-size:.62rem;color:var(--muted);margin-top:.3rem" id="d-m2-period"></div>
+  </div>
+
+  <div class="grid3" style="margin-bottom:.8rem">
+    <div class="card" style="margin-bottom:0;position:relative">
+      <div class="stat-label" style="display:flex;align-items:center;gap:.3rem">
+        M2 MoM
+        <span class="info-icon" onclick="toggleTip('tip-mom')">ℹ</span>
+      </div>
+      <div class="stat-val" id="d-m2-mom">—</div>
+      <div class="info-tip" id="tip-mom">
+        <strong>MoM — Month over Month</strong><br>
+        Variação do M2 face ao mês anterior. Mede a aceleração ou abrandamento recente da criação de moeda.
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:0;position:relative">
+      <div class="stat-label" style="display:flex;align-items:center;gap:.3rem">
+        M2 YoY
+        <span class="info-icon" onclick="toggleTip('tip-m2yoy')">ℹ</span>
+      </div>
+      <div class="stat-val" id="d-m2-yoy">—</div>
+      <div class="info-tip" id="tip-m2yoy">
+        <strong>YoY — Year over Year</strong><br>
+        Variação do M2 face ao mesmo mês do ano anterior. Principal indicador de expansão monetária anual.
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:0;position:relative">
+      <div class="stat-label" style="display:flex;align-items:center;gap:.3rem">
+        M3 YoY
+        <span class="info-icon" onclick="toggleTip('tip-m3yoy')">ℹ</span>
+      </div>
+      <div class="stat-val" id="d-m3-yoy">—</div>
+      <div class="info-tip" id="tip-m3yoy">
+        <strong>M3 YoY</strong><br>
+        Variação anual do M3, o agregado mais amplo monitorizado pelo BCE. Inclui M2 + instrumentos de mercado monetário.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Expansão monetária · 5 anos (M2)</div>
+    <div class="big" id="d-exp5" style="color:var(--red)"><span class="skel" style="width:5rem;height:2rem"></span></div>
+    <div style="font-size:.62rem;color:var(--muted);margin-top:.3rem" id="d-exp5-sub"></div>
+  </div>
+
+  <div class="status">
+    <div class="dot" id="dot-dash"></div>
+    <span id="status-dash">A carregar dados…</span>
+  </div>
+  <div class="footnote">
+    Fonte: BCE SDMX API · M2 série BSI/M.U2.Y.V.M20 · M3 série BSI/M.U2.Y.V.M30 ·
+    Expansão monetária = crescimento percentual da base monetária, proxy para inflação potencial.
+    Valores em mil milhões de euros (M€).
+  </div>
+</div>
+
+<!-- ══ GRÁFICO ══ -->
+<div class="section" id="tab-grafico">
+  <div class="range-row">
+    <span class="range-label">Período:</span>
+    <select id="g-range" onchange="renderChart()">
+      <option value="12">12 meses</option>
+      <option value="24" selected>24 meses</option>
+      <option value="36">3 anos</option>
+      <option value="60">5 anos</option>
+      <option value="120">10 anos</option>
+      <option value="240">20 anos</option>
+      <option value="0">Tudo (histórico completo)</option>
+    </select>
+    <select id="g-mode" onchange="renderChart()">
+      <option value="abs">Valor absoluto</option>
+      <option value="idx">Índice base=100</option>
+      <option value="yoy">Var. anual %</option>
+    </select>
+  </div>
+  <div class="chart-legend">
+    <span><span class="legend-dot" style="background:var(--m2)"></span>M2</span>
+    <span><span class="legend-dot" style="background:var(--m3)"></span>M3</span>
+  </div>
+  <div class="chart-container">
+    <canvas id="main-chart" height="220"></canvas>
+  </div>
+  <div class="footnote">Valores em M€ (mil milhões de euros) · índice base=100 no início do período selecionado.</div>
+</div>
+
+<!-- ══ COMPARADOR ══ -->
+<div class="section" id="tab-comparador">
+  <div class="card">
+    <div class="card-label">Comparar dois períodos</div>
+    <div class="grid2" style="margin-bottom:.7rem">
+      <div>
+        <div class="stat-label" style="margin-bottom:.3rem">Período A</div>
+        <select id="c-a" style="width:100%"></select>
+      </div>
+      <div>
+        <div class="stat-label" style="margin-bottom:.3rem">Período B</div>
+        <select id="c-b" style="width:100%"></select>
+      </div>
+    </div>
+    <button class="btn" style="width:100%;justify-content:center" onclick="runComparator()">Comparar</button>
+  </div>
+
+  <div class="comp-result" id="comp-result" style="display:none">
+    <div class="comp-row">
+      <span class="comp-key">M2 em <span id="cr-a-label"></span></span>
+      <span class="comp-val" id="cr-m2-a">—</span>
+    </div>
+    <div class="comp-row">
+      <span class="comp-key">M2 em <span id="cr-b-label"></span></span>
+      <span class="comp-val" id="cr-m2-b">—</span>
+    </div>
+    <div class="comp-row">
+      <span class="comp-key">Variação M2</span>
+      <span class="comp-val" id="cr-m2-chg">—</span>
+    </div>
+    <div class="comp-row">
+      <span class="comp-key">M3 em <span id="cr-a2-label"></span></span>
+      <span class="comp-val" id="cr-m3-a">—</span>
+    </div>
+    <div class="comp-row">
+      <span class="comp-key">M3 em <span id="cr-b2-label"></span></span>
+      <span class="comp-val" id="cr-m3-b">—</span>
+    </div>
+    <div class="comp-row">
+      <span class="comp-key">Variação M3</span>
+      <span class="comp-val" id="cr-m3-chg">—</span>
+    </div>
+    <div class="comp-row" style="border-top:1px solid var(--border2);margin-top:.3rem;padding-top:.5rem">
+      <span class="comp-key">Meses entre períodos</span>
+      <span class="comp-val" id="cr-months">—</span>
+    </div>
+    <div class="comp-row">
+      <span class="comp-key">Expansão anualizada (M2)</span>
+      <span class="comp-val" id="cr-annualized" style="color:var(--red)">—</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ INFLAÇÃO MONETÁRIA ══ -->
+<div class="section" id="tab-inflacao">
+  <div class="card">
+    <div class="card-label">Calcular poder de compra perdido</div>
+    <div class="range-row" style="margin-bottom:.5rem">
+      <span class="range-label">Desde:</span>
+      <select id="i-from" style="flex:1"></select>
+    </div>
+    <div class="range-row" style="margin-bottom:.7rem">
+      <span class="range-label">Até:</span>
+      <select id="i-to" style="flex:1"></select>
+    </div>
+    <div class="grid2" style="margin-bottom:.7rem">
+      <div>
+        <div class="stat-label" style="margin-bottom:.3rem">Valor em €</div>
+        <input type="number" id="i-amount" value="1000" min="1"
+          style="background:var(--s2);border:1px solid var(--border2);color:var(--text);
+          font-family:'Syne',sans-serif;font-size:.8rem;padding:.35rem .5rem;
+          border-radius:4px;width:100%">
+      </div>
+      <div>
+        <div class="stat-label" style="margin-bottom:.3rem">Agregado</div>
+        <select id="i-agg" style="width:100%">
+          <option value="m2">M2</option>
+          <option value="m3">M3</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" style="width:100%" onclick="calcInflation()">Calcular</button>
+  </div>
+
+  <div class="infl-block" id="infl-result" style="display:none">
+    <div class="stat-label">Poder de compra equivalente hoje</div>
+    <div class="infl-big" id="i-result-val">—</div>
+    <div class="infl-explain" id="i-result-explain"></div>
+  </div>
+
+  <div class="footnote" style="margin-top:.8rem">
+    <strong style="color:var(--text)">Nota metodológica:</strong> A inflação monetária aqui calculada baseia-se na expansão da massa monetária (M2 ou M3), não no IPC oficial. A teoria quantitativa da moeda (MV=PQ) sugere que um aumento da oferta monetária, mantendo-se constante a velocidade e a produção, traduz-se em aumento de preços. Este método tende a mostrar inflação superior ao IPC oficial.
+  </div>
+</div>
+
+<!-- ══ EMISSÃO ══ -->
+<div class="section" id="tab-emissao">
+  <div class="range-row">
+    <span class="range-label">Período:</span>
+    <select id="e-range" onchange="renderEmissao()">
+      <option value="12">12 meses</option>
+      <option value="24" selected>24 meses</option>
+      <option value="36">3 anos</option>
+      <option value="60">5 anos</option>
+      <option value="0">Tudo</option>
+    </select>
+    <select id="e-agg" onchange="renderEmissao()">
+      <option value="m2">M2</option>
+      <option value="m3">M3</option>
+    </select>
+  </div>
+  <div class="grid2" style="margin-bottom:.8rem">
+    <div class="card" style="margin-bottom:0;position:relative">
+      <div class="stat-label" style="display:flex;align-items:center;gap:.3rem">
+        Nova moeda · período
+        <span class="info-icon" onclick="toggleTip('tip-e-total')">ℹ</span>
+      </div>
+      <div style="font-size:1.2rem;font-family:'Instrument Serif',serif" id="e-total">—</div>
+      <div class="info-tip" id="tip-e-total">
+        <strong>Nova moeda no período</strong>
+        Soma líquida de toda a moeda criada (ou destruída) mês a mês durante o período selecionado. Valor positivo = mais moeda em circulação do que no início. Inclui criação pelo BCE e pelos bancos comerciais via crédito.
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:0;position:relative">
+      <div class="stat-label" style="display:flex;align-items:center;gap:.3rem">
+        Média mensal
+        <span class="info-icon" onclick="toggleTip('tip-e-avg')">ℹ</span>
+      </div>
+      <div style="font-size:1.2rem;font-family:'Instrument Serif',serif" id="e-avg">—</div>
+      <div class="info-tip" id="tip-e-avg">
+        <strong>Média de nova moeda por mês</strong>
+        Total do período a dividir pelo número de meses. Indica o ritmo médio de expansão monetária — quantos mil milhões de euros são criados em média por mês.
+      </div>
+    </div>
+  </div>
+  <div class="grid2" style="margin-bottom:.8rem">
+    <div class="card" style="margin-bottom:0;position:relative">
+      <div class="stat-label" style="display:flex;align-items:center;gap:.3rem">
+        Maior emissão (mês)
+        <span class="info-icon" onclick="toggleTip('tip-e-max')">ℹ</span>
+      </div>
+      <div class="up" style="font-size:1rem;font-family:'Instrument Serif',serif" id="e-max">—</div>
+      <div style="font-size:.58rem;color:var(--muted);margin-top:.2rem" id="e-max-p"></div>
+      <div class="info-tip" id="tip-e-max">
+        <strong>Maior expansão num único mês</strong>
+        O mês em que foi criada mais moeda nova de uma só vez no período selecionado. Picos elevados ocorrem frequentemente em períodos de crise (ex: COVID 2020) ou de estímulo monetário.
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:0;position:relative">
+      <div class="stat-label" style="display:flex;align-items:center;gap:.3rem">
+        Maior contração (mês)
+        <span class="info-icon" onclick="toggleTip('tip-e-min')">ℹ</span>
+      </div>
+      <div class="down" style="font-size:1rem;font-family:'Instrument Serif',serif" id="e-min">—</div>
+      <div style="font-size:.58rem;color:var(--muted);margin-top:.2rem" id="e-min-p"></div>
+      <div class="info-tip" id="tip-e-min">
+        <strong>Maior contração num único mês</strong>
+        O mês em que mais moeda saiu de circulação. Valores negativos indicam contração monetária — ocorre quando os bancos reduzem crédito ou o BCE retira liquidez do sistema.
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">Nova moeda criada por mês (M€) · vermelho=expansão · verde=contração</div>
+    <div class="chart-container">
+      <canvas id="emissao-chart" height="180"></canvas>
+    </div>
+  </div>
+  <table class="tbl" style="margin-top:.6rem">
+    <thead>
+      <tr>
+        <th>Período</th>
+        <th>Saldo M€</th>
+        <th>Nova moeda M€</th>
+        <th>MoM %</th>
+        <th>Acum. ano M€</th>
+      </tr>
+    </thead>
+    <tbody id="emissao-body"></tbody>
+  </table>
+  <div class="footnote">
+    <strong style="color:var(--text)">Nova moeda</strong> = variação absoluta do saldo M2/M3 entre meses consecutivos. Inclui criação pelo BCE e pelos bancos comerciais via multiplicador de crédito. Acumulado anual = soma de Janeiro até cada mês no mesmo ano civil.
+  </div>
+</div>
+
+<!-- ══ HISTÓRICO ══ -->
+<div class="section" id="tab-historico">
+  <div class="range-row">
+    <span class="range-label">Mostrar:</span>
+    <select id="h-range" onchange="renderTable()">
+      <option value="12">12 meses</option>
+      <option value="24" selected>24 meses</option>
+      <option value="60">5 anos</option>
+      <option value="0">Tudo</option>
+    </select>
+    <select id="h-agg" onchange="renderTable()">
+      <option value="m2">M2</option>
+      <option value="m3">M3</option>
+    </select>
+  </div>
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th>Período</th>
+        <th>Valor M€</th>
+        <th class="bar-cell"></th>
+        <th>MoM %</th>
+        <th>YoY %</th>
+      </tr>
+    </thead>
+    <tbody id="hist-body">
+      <tr><td colspan="5" style="padding:1.5rem;text-align:center;color:var(--muted)">
+        <span class="skel" style="width:100%;height:.7rem;display:block"></span>
+      </td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let DATA = { m2: [], m3: [] };
+let loaded = false;
+
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+const fmtM = v => new Intl.NumberFormat('pt-PT',{minimumFractionDigits:1,maximumFractionDigits:1}).format(v/1000);
+const fmtDiff = v => (v>=0?'+':'')+new Intl.NumberFormat('pt-PT',{minimumFractionDigits:1,maximumFractionDigits:1}).format(v/1000);
+const fmtPct = (a,b) => { const p=(a-b)/b*100; return (p>=0?'+':'')+p.toFixed(2)+'%'; };
+const clsPct = v => parseFloat(v)>0?'up':'down';
+
+function getByPeriod(arr, period) {
+  return arr.find(d => d.period === period);
+}
+
+// ═══════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const ids=['dashboard','grafico','comparador','inflacao','historico','emissao'];
+    t.classList.toggle('active', ids[i]===id);
+  });
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(id==='grafico'&&loaded) setTimeout(renderChart,50);
+  if(id==='historico'&&loaded) renderTable();
+  if(id==='emissao'&&loaded) setTimeout(renderEmissao,50);
+}
+
+function toggleTip(id) {
+  // close all others first
+  document.querySelectorAll('.info-tip').forEach(t => {
+    if(t.id !== id) t.classList.remove('open');
+  });
+  document.getElementById(id).classList.toggle('open');
+  // close on outside tap
+  setTimeout(()=>{
+    document.addEventListener('click', function closeTip(e){
+      if(!e.target.classList.contains('info-icon')){
+        document.querySelectorAll('.info-tip').forEach(t=>t.classList.remove('open'));
+      }
+      document.removeEventListener('click', closeTip);
+    });
+  }, 10);
+}
+
+// ═══════════════════════════════════════════
+// LOAD DATA — BCE direto + proxies CORS
+// ═══════════════════════════════════════════
+
+const BCE_M2 = 'https://data-api.ecb.europa.eu/service/data/BSI/M.U2.Y.V.M20.X.1.U2.2300.Z01.E?format=jsondata&detail=dataonly&lastNObservations=400';
+const BCE_M3 = 'https://data-api.ecb.europa.eu/service/data/BSI/M.U2.Y.V.M30.X.1.U2.2300.Z01.E?format=jsondata&detail=dataonly&lastNObservations=400';
+
+function getUrls(ecbUrl) {
+  return [
+    ecbUrl, // direto (funciona fora do claude.ai)
+    `https://corsproxy.io/?${encodeURIComponent(ecbUrl)}`,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(ecbUrl)}`,
+    `https://thingproxy.freeboard.io/fetch/${ecbUrl}`,
+    `https://cors-anywhere.herokuapp.com/${ecbUrl}`,
+  ];
+}
+
+async function fetchEcb(ecbUrl) {
+  const urls = getUrls(ecbUrl);
+  let lastErr;
+  for(const url of urls) {
+    try {
+      const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      return json;
+    } catch(e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr || new Error('Sem acesso ao BCE');
+}
+
+function parseEcbJson(json) {
+  const series = json.dataSets[0].series;
+  const key = Object.keys(series)[0];
+  const obs  = series[key].observations;
+  const times = json.structure.dimensions.observation[0].values;
+  return Object.keys(obs)
+    .map(k => ({ period: times[+k].id, value: obs[k][0] }))
+    .sort((a,b) => a.period.localeCompare(b.period));
+}
+
+async function loadAll() {
+  setStatus('loading', 'A carregar M2…');
+  document.getElementById('btn-refresh').disabled = true;
+
+  try {
+    const rawM2 = await fetchEcb(BCE_M2);
+    setStatus('loading', 'A carregar M3…');
+    const rawM3 = await fetchEcb(BCE_M3);
+
+    DATA.m2 = parseEcbJson(rawM2);
+    DATA.m3 = parseEcbJson(rawM3);
+
+    if(!DATA.m2.length || !DATA.m3.length) throw new Error('Dados vazios');
+
+    loaded = true;
+    renderDashboard();
+    populateSelects();
+    setStatus('live', `Atualizado · ${DATA.m2[0].period} → ${DATA.m2[DATA.m2.length-1].period}`);
+  } catch(e) {
+    setStatus('err', 'Erro: ' + e.message + ' — tente fora do claude.ai');
+  } finally {
+    document.getElementById('btn-refresh').disabled = false;
+  }
+}
+
+function setStatus(state, msg) {
+  const dot = document.getElementById('dot-dash');
+  const txt = document.getElementById('status-dash');
+  dot.className='dot'+(state==='live'?' live':state==='loading'?' loading':state==='err'?' err':'');
+  txt.textContent=msg;
+}
+
+// ═══════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════
+function renderDashboard() {
+  const m2 = DATA.m2, m3 = DATA.m3;
+  const lm2=m2[m2.length-1], pm2=m2[m2.length-2], ym2=m2.length>=13?m2[m2.length-13]:m2[0];
+  const lm3=m3[m3.length-1], pm3=m3[m3.length-2], ym3=m3.length>=13?m3[m3.length-13]:m3[0];
+
+  document.getElementById('d-m3-val').innerHTML=`${fmtM(lm3.value)} <span style="font-size:.75rem;color:var(--muted)">M€</span>`;
+  document.getElementById('d-m3-period').textContent=`Referência: ${lm3.period}`;
+  document.getElementById('d-m2-val').innerHTML=`${fmtM(lm2.value)} <span style="font-size:.75rem;color:var(--muted)">M€</span>`;
+  document.getElementById('d-m2-period').textContent=`Referência: ${lm2.period}`;
+
+  const momM2=((lm2.value-pm2.value)/pm2.value*100);
+  const yoyM2=((lm2.value-ym2.value)/ym2.value*100);
+  const yoyM3=((lm3.value-ym3.value)/ym3.value*100);
+
+  const sm=document.getElementById('d-m2-mom');
+  sm.textContent=(momM2>=0?'+':'')+momM2.toFixed(2)+'%';
+  sm.className='stat-val '+(momM2>0?'up':'down');
+
+  const sy=document.getElementById('d-m2-yoy');
+  sy.textContent=(yoyM2>=0?'+':'')+yoyM2.toFixed(2)+'%';
+  sy.className='stat-val '+(yoyM2>0?'up':'down');
+
+  const sy3=document.getElementById('d-m3-yoy');
+  sy3.textContent=(yoyM3>=0?'+':'')+yoyM3.toFixed(2)+'%';
+  sy3.className='stat-val '+(yoyM3>0?'up':'down');
+
+  // 5-year expansion
+  const m2_5y = m2.length>=61?m2[m2.length-61]:m2[0];
+  const exp5 = ((lm2.value-m2_5y.value)/m2_5y.value*100);
+  document.getElementById('d-exp5').textContent='+'+(exp5.toFixed(1))+'%';
+  document.getElementById('d-exp5-sub').textContent=
+    `M2 expandiu ${exp5.toFixed(1)}% desde ${m2_5y.period} — de ${fmtM(m2_5y.value)} para ${fmtM(lm2.value)} M€`;
+}
+
+// ═══════════════════════════════════════════
+// CHART
+// ═══════════════════════════════════════════
+// chart state for tooltip
+let CHART_STATE = null;
+
+function renderChart() {
+  if(!loaded) return;
+  const n = parseInt(document.getElementById('g-range').value)||DATA.m2.length;
+  const mode = document.getElementById('g-mode').value;
+
+  // For YoY, always fetch 12 extra months from full data for calculation
+  const fullM2 = DATA.m2, fullM3 = DATA.m3;
+  const allPeriods = [...new Set([...fullM2.map(d=>d.period),...fullM3.map(d=>d.period)])].sort();
+  const m2mapFull = Object.fromEntries(fullM2.map(d=>[d.period,d.value]));
+  const m3mapFull = Object.fromEntries(fullM3.map(d=>[d.period,d.value]));
+
+  // window of periods to display
+  const displayPeriods = n>0 ? allPeriods.slice(-n) : allPeriods;
+
+  let vals2=[], vals3=[], unit='';
+
+  if(mode==='abs'){
+    vals2=displayPeriods.map(p=>m2mapFull[p]!=null?m2mapFull[p]/1000:null);
+    vals3=displayPeriods.map(p=>m3mapFull[p]!=null?m3mapFull[p]/1000:null);
+    unit='M€';
+  } else if(mode==='idx'){
+    const base2=m2mapFull[displayPeriods[0]]||1, base3=m3mapFull[displayPeriods[0]]||1;
+    vals2=displayPeriods.map(p=>m2mapFull[p]!=null?(m2mapFull[p]/base2*100):null);
+    vals3=displayPeriods.map(p=>m3mapFull[p]!=null?(m3mapFull[p]/base3*100):null);
+    unit='idx';
+  } else { // yoy — use full allPeriods for lookback, display only window
+    vals2=displayPeriods.map(p=>{
+      const idx=allPeriods.indexOf(p);
+      if(idx<12) return null;
+      const prev=allPeriods[idx-12];
+      return m2mapFull[p]!=null&&m2mapFull[prev]!=null?((m2mapFull[p]-m2mapFull[prev])/m2mapFull[prev]*100):null;
+    });
+    vals3=displayPeriods.map(p=>{
+      const idx=allPeriods.indexOf(p);
+      if(idx<12) return null;
+      const prev=allPeriods[idx-12];
+      return m3mapFull[p]!=null&&m3mapFull[prev]!=null?((m3mapFull[p]-m3mapFull[prev])/m3mapFull[prev]*100):null;
+    });
+    unit='%';
+  }
+
+  CHART_STATE = { labels: displayPeriods, v2: vals2, v3: vals3, mode, unit };
+  drawDualChart('main-chart', CHART_STATE);
+}
+
+function drawDualChart(id, state) {
+  const { labels, v2, v3, mode, unit } = state;
+  const canvas = document.getElementById(id);
+  const dpr = window.devicePixelRatio||1;
+  const W = canvas.offsetWidth||340, H = 240;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const padL = 46, padR = 10, padT = 14, padB = 30;
+  const W2 = W-padL-padR, H2 = H-padT-padB;
+
+  const allV = [...v2,...v3].filter(x=>x!==null);
+  if(!allV.length){
+    ctx.fillStyle='#5c6070';
+    ctx.font='11px Syne,sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('Sem dados suficientes para este período', W/2, H/2);
+    return;
+  }
+
+  const rawMin=Math.min(...allV), rawMax=Math.max(...allV);
+  // nice scale
+  const range = rawMax-rawMin||1;
+  const step = Math.pow(10, Math.floor(Math.log10(range/4)));
+  const minV = Math.floor(rawMin/step)*step;
+  const maxV = Math.ceil(rawMax/step)*step;
+  const rng = maxV-minV||1;
+
+  const xp = i => padL + (i/(labels.length-1||1))*W2;
+  const yp = v => padT + (1-(v-minV)/rng)*H2;
+
+  // ── Y axis grid + labels ──
+  const ySteps = 5;
+  ctx.font = `${8.5}px Syne,sans-serif`;
+  ctx.textAlign = 'right';
+  for(let i=0;i<=ySteps;i++){
+    const v = minV + (i/ySteps)*(maxV-minV);
+    const y = yp(v);
+    // grid line
+    ctx.strokeStyle='rgba(255,255,255,.06)'; ctx.lineWidth=1;
+    ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL+W2, y); ctx.stroke();
+    // label
+    ctx.fillStyle='#5c6070';
+    let lbl = unit==='M€' ? fmtM(v*1000) : v.toFixed(unit==='%'?1:0)+(unit==='idx'?'':unit);
+    ctx.fillText(lbl, padL-4, y+3);
+  }
+
+  // zero line for yoy
+  if(mode==='yoy' && minV<0 && maxV>0){
+    const zy = yp(0);
+    ctx.strokeStyle='rgba(255,255,255,.2)'; ctx.lineWidth=1;
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(padL,zy); ctx.lineTo(padL+W2,zy); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // ── draw lines ──
+  function drawLine(vals, color) {
+    const pts = vals.map((v,i)=>v!=null?{x:xp(i),y:yp(v),v,i}:null).filter(Boolean);
+    if(!pts.length) return;
+    // area
+    const grad=ctx.createLinearGradient(0,padT,0,padT+H2);
+    grad.addColorStop(0,color+'2a'); grad.addColorStop(1,color+'03');
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    pts.slice(1).forEach(p=>ctx.lineTo(p.x,p.y));
+    ctx.lineTo(pts[pts.length-1].x, padT+H2);
+    ctx.lineTo(pts[0].x, padT+H2);
+    ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+    // line
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x,pts[0].y);
+    pts.slice(1).forEach(p=>ctx.lineTo(p.x,p.y));
+    ctx.strokeStyle=color; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.stroke();
+    // last dot
+    const lp=pts[pts.length-1];
+    ctx.beginPath(); ctx.arc(lp.x,lp.y,3.5,0,Math.PI*2);
+    ctx.fillStyle=color; ctx.fill();
+    ctx.strokeStyle='#08090b'; ctx.lineWidth=1.5; ctx.stroke();
+  }
+  drawLine(v3,'#40c8f0');
+  drawLine(v2,'#f0c040');
+
+  // ── X labels ──
+  ctx.fillStyle='#5c6070'; ctx.font=`${8.5}px Syne,sans-serif`; ctx.textAlign='center';
+  ctx.setLineDash([]);
+  const xStep = Math.max(1,Math.floor(labels.length/5));
+  for(let i=0;i<labels.length;i+=xStep) ctx.fillText(labels[i].slice(0,7), xp(i), H-8);
+  ctx.fillText(labels[labels.length-1].slice(0,7), xp(labels.length-1), H-8);
+
+  // ── touch/hover tooltip ──
+  // store geometry for interaction
+  canvas._chartState = { labels, v2, v3, mode, unit, xp, yp, padL, padR, padT, padB, W2, H2, minV, maxV };
+}
+
+// tooltip overlay element
+function initChartTooltip() {
+  const canvas = document.getElementById('main-chart');
+  const tip = document.createElement('div');
+  tip.id = 'chart-tip';
+  tip.style.cssText = `
+    position:absolute;display:none;
+    background:var(--s2);border:1px solid var(--border2);
+    border-radius:5px;padding:.5rem .7rem;
+    font-size:.65rem;line-height:1.6;color:var(--text);
+    pointer-events:none;z-index:60;
+    box-shadow:0 4px 12px rgba(0,0,0,.5);
+    white-space:nowrap;
+  `;
+  canvas.parentNode.style.position='relative';
+  canvas.parentNode.appendChild(tip);
+
+  function showTip(clientX, clientY) {
+    const s = canvas._chartState;
+    if(!s) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const relX = x - s.padL;
+    if(relX < 0 || relX > s.W2) { tip.style.display='none'; return; }
+    const idx = Math.round((relX/s.W2)*(s.labels.length-1));
+    const p = s.labels[idx];
+    const val2 = s.v2[idx], val3 = s.v3[idx];
+    const fmt = v => v==null?'—':(s.unit==='M€'?fmtM(v*1000)+' M€':(v>=0?'+':'')+v.toFixed(2)+(s.unit==='idx'?' idx':'%'));
+
+    tip.innerHTML = `<strong style="color:var(--accent)">${p}</strong><br>
+      <span style="color:var(--m2)">● M2</span> ${fmt(val2)}<br>
+      <span style="color:var(--m3)">● M3</span> ${fmt(val3)}`;
+
+    // position tip
+    let left = x + 10;
+    if(left + 140 > rect.width) left = x - 150;
+    tip.style.left = left+'px';
+    tip.style.top = (clientY - rect.top - 10)+'px';
+    tip.style.display = 'block';
+  }
+
+  canvas.addEventListener('mousemove', e => showTip(e.clientX, e.clientY));
+  canvas.addEventListener('mouseleave', () => tip.style.display='none');
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); showTip(e.touches[0].clientX, e.touches[0].clientY); }, {passive:false});
+  canvas.addEventListener('touchmove',  e => { e.preventDefault(); showTip(e.touches[0].clientX, e.touches[0].clientY); }, {passive:false});
+  canvas.addEventListener('touchend',   () => setTimeout(()=>tip.style.display='none', 1800));
+}
+
+window.addEventListener('load', ()=>setTimeout(initChartTooltip, 500));
+
+// ═══════════════════════════════════════════
+// SELECTS
+// ═══════════════════════════════════════════
+function populateSelects() {
+  const periods=[...new Set([...DATA.m2.map(d=>d.period),...DATA.m3.map(d=>d.period)])].sort().reverse();
+
+  ['c-a','c-b','i-from','i-to'].forEach(id=>{
+    const sel=document.getElementById(id);
+    sel.innerHTML=periods.map(p=>`<option value="${p}">${p}</option>`).join('');
+  });
+
+  // defaults: c-a = 5 years ago, c-b = latest
+  const ca=document.getElementById('c-a');
+  const idx5=Math.min(59,periods.length-1);
+  ca.value=periods[idx5]||periods[periods.length-1];
+
+  // i-from = 5 years ago
+  document.getElementById('i-from').value=periods[idx5]||periods[periods.length-1];
+  document.getElementById('i-to').value=periods[0];
+}
+
+// ═══════════════════════════════════════════
+// COMPARATOR
+// ═══════════════════════════════════════════
+function runComparator() {
+  const pa=document.getElementById('c-a').value;
+  const pb=document.getElementById('c-b').value;
+  if(pa===pb){alert('Escolhe dois períodos diferentes');return;}
+
+  const [pA,pB]=[pa,pb].sort();
+  const m2a=DATA.m2.find(d=>d.period===pA), m2b=DATA.m2.find(d=>d.period===pB);
+  const m3a=DATA.m3.find(d=>d.period===pA), m3b=DATA.m3.find(d=>d.period===pB);
+
+  if(!m2a||!m2b){alert('Dados não disponíveis para um dos períodos');return;}
+
+  document.getElementById('cr-a-label').textContent=pA;
+  document.getElementById('cr-b-label').textContent=pB;
+  document.getElementById('cr-a2-label').textContent=pA;
+  document.getElementById('cr-b2-label').textContent=pB;
+
+  document.getElementById('cr-m2-a').textContent=fmtM(m2a.value)+' M€';
+  document.getElementById('cr-m2-b').textContent=fmtM(m2b.value)+' M€';
+  const m2chg=((m2b.value-m2a.value)/m2a.value*100);
+  const m2chgEl=document.getElementById('cr-m2-chg');
+  m2chgEl.textContent=fmtDiff(m2b.value-m2a.value)+' M€ ('+m2chg.toFixed(2)+'%)';
+  m2chgEl.className='comp-val '+(m2chg>0?'up':'down');
+
+  if(m3a&&m3b){
+    document.getElementById('cr-m3-a').textContent=fmtM(m3a.value)+' M€';
+    document.getElementById('cr-m3-b').textContent=fmtM(m3b.value)+' M€';
+    const m3chg=((m3b.value-m3a.value)/m3a.value*100);
+    const m3chgEl=document.getElementById('cr-m3-chg');
+    m3chgEl.textContent=fmtDiff(m3b.value-m3a.value)+' M€ ('+m3chg.toFixed(2)+'%)';
+    m3chgEl.className='comp-val '+(m3chg>0?'up':'down');
+  }
+
+  // months between
+  const [y1,mo1]=pA.split('-').map(Number);
+  const [y2,mo2]=pB.split('-').map(Number);
+  const months=(y2-y1)*12+(mo2-mo1);
+  document.getElementById('cr-months').textContent=months+' meses';
+
+  // annualized
+  const annualized=(Math.pow(m2b.value/m2a.value, 12/months)-1)*100;
+  const annEl=document.getElementById('cr-annualized');
+  annEl.textContent=(annualized>=0?'+':'')+annualized.toFixed(2)+'% / ano';
+  annEl.className='comp-val '+(annualized>0?'up':'down');
+
+  document.getElementById('comp-result').style.display='block';
+}
+
+// ═══════════════════════════════════════════
+// INFLATION CALC
+// ═══════════════════════════════════════════
+function calcInflation() {
+  const from=document.getElementById('i-from').value;
+  const to=document.getElementById('i-to').value;
+  const amount=parseFloat(document.getElementById('i-amount').value)||1000;
+  const agg=document.getElementById('i-agg').value;
+  const data=DATA[agg];
+
+  const [pF,pT]=[from,to].sort();
+  const dF=data.find(d=>d.period===pF);
+  const dT=data.find(d=>d.period===pT);
+
+  if(!dF||!dT){alert('Dados não disponíveis para um dos períodos');return;}
+
+  const expansion=dT.value/dF.value;
+  const equivalent=amount*expansion;
+  const lost=equivalent-amount;
+  const lostPct=((expansion-1)*100);
+
+  const [y1,m1]=pF.split('-').map(Number);
+  const [y2,m2]=pT.split('-').map(Number);
+  const months=(y2-y1)*12+(m2-m1);
+  const years=(months/12).toFixed(1);
+  const annualized=(Math.pow(expansion,12/months)-1)*100;
+
+  document.getElementById('i-result-val').textContent=
+    new Intl.NumberFormat('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}).format(equivalent)+' €';
+
+  document.getElementById('i-result-explain').innerHTML=`
+    <strong>${new Intl.NumberFormat('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}).format(amount)} €</strong> em <strong>${pF}</strong> equivalem a
+    <strong>${new Intl.NumberFormat('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}).format(equivalent)} €</strong> em <strong>${pT}</strong>,
+    com base na expansão do ${agg.toUpperCase()} de <strong>+${lostPct.toFixed(1)}%</strong> ao longo de ${years} anos (${months} meses).<br><br>
+    Taxa anualizada: <strong>+${annualized.toFixed(2)}%/ano</strong> · expansão total: <strong>×${expansion.toFixed(3)}</strong><br>
+    Poder de compra perdido: <strong>${new Intl.NumberFormat('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2}).format(lost)} €</strong>
+  `;
+
+  document.getElementById('infl-result').style.display='block';
+}
+
+// ═══════════════════════════════════════════
+// TABLE
+// ═══════════════════════════════════════════
+function renderTable() {
+  if(!loaded) return;
+  const n=parseInt(document.getElementById('h-range').value)||99999;
+  const agg=document.getElementById('h-agg').value;
+  const data=(n>0?DATA[agg].slice(-n):DATA[agg]).slice().reverse();
+  const all=DATA[agg];
+
+  const maxV=Math.max(...data.map(d=>d.value));
+  const minV=Math.min(...data.map(d=>d.value));
+  const rng=maxV-minV||1;
+
+  const tbody=document.getElementById('hist-body');
+  tbody.innerHTML=data.map(d=>{
+    const idx=all.findIndex(x=>x.period===d.period);
+    const prev=idx>0?all[idx-1]:null;
+    const ya=idx>=12?all[idx-12]:null;
+    const mom=prev?((d.value-prev.value)/prev.value*100):null;
+    const yoy=ya?((d.value-ya.value)/ya.value*100):null;
+    const barW=((d.value-minV)/rng*100).toFixed(1);
+    const momStr=mom!==null?`<span class="${mom>0?'up':'down'}">${(mom>=0?'+':'')+mom.toFixed(2)}%</span>`:'—';
+    const yoyStr=yoy!==null?`<span class="${yoy>0?'up':'down'}">${(yoy>=0?'+':'')+yoy.toFixed(2)}%</span>`:'—';
+    return `<tr>
+      <td class="period">${d.period}</td>
+      <td>${fmtM(d.value)}</td>
+      <td class="bar-cell"><div class="bar-t"><div class="bar-f" style="width:${barW}%;background:${agg==='m2'?'var(--m2)':'var(--m3)'}"></div></div></td>
+      <td>${momStr}</td>
+      <td>${yoyStr}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// EMISSÃO
+// ═══════════════════════════════════════════
+function renderEmissao() {
+  if(!loaded) return;
+  const n = parseInt(document.getElementById('e-range').value)||99999;
+  const agg = document.getElementById('e-agg').value;
+  const all = DATA[agg];
+
+  // need one extra point before the window for first diff
+  const startIdx = n>0 ? Math.max(0, all.length-n-1) : 0;
+  const slice = all.slice(startIdx);
+
+  // build emissions array
+  const emissions = [];
+  for(let i=1;i<slice.length;i++){
+    const diff = slice[i].value - slice[i-1].value;
+    const pct  = (diff/slice[i-1].value)*100;
+    // year accumulator
+    const yr = slice[i].period.slice(0,4);
+    emissions.push({ period: slice[i].period, value: slice[i].value, diff, pct, yr });
+  }
+
+  // trim to n
+  const data = n>0 ? emissions.slice(-n) : emissions;
+
+  // stats
+  const total = data.reduce((s,d)=>s+d.diff,0);
+  const avg   = total/data.length;
+  const maxD  = data.reduce((a,b)=>b.diff>a.diff?b:a);
+  const minD  = data.reduce((a,b)=>b.diff<a.diff?b:a);
+
+  const fmtE = v => (v>=0?'+':'')+fmtM(v);
+
+  document.getElementById('e-total').innerHTML =
+    `<span class="${total>=0?'up':'down'}">${fmtE(total)} M€</span>`;
+  document.getElementById('e-avg').innerHTML =
+    `<span class="${avg>=0?'up':'down'}">${fmtE(avg)} M€</span>`;
+  document.getElementById('e-max').textContent = '+'+fmtM(maxD.diff)+' M€';
+  document.getElementById('e-max-p').textContent = maxD.period;
+  document.getElementById('e-min').textContent = fmtM(minD.diff)+' M€';
+  document.getElementById('e-min-p').textContent = minD.period;
+
+  // bar chart
+  drawEmissaoChart('emissao-chart', data);
+
+  // table with year accumulator
+  const yearAcc = {};
+  // pre-fill from emissions before our window
+  emissions.forEach(d=>{
+    if(!data.find(x=>x.period===d.period)){
+      yearAcc[d.yr] = (yearAcc[d.yr]||0)+d.diff;
+    }
+  });
+
+  const tbody = document.getElementById('emissao-body');
+  const rows = data.slice().reverse();
+  let runAcc = {};
+  // compute accumulators forward
+  const fwdAcc = {};
+  data.forEach(d=>{
+    fwdAcc[d.yr] = (fwdAcc[d.yr]||0)+d.diff;
+    d._acc = fwdAcc[d.yr];
+  });
+
+  tbody.innerHTML = rows.map(d=>{
+    const diffCls = d.diff>=0?'up':'down';
+    const pctStr  = (d.pct>=0?'+':'')+d.pct.toFixed(2)+'%';
+    const accStr  = fmtE(d._acc)+' M€';
+    return `<tr>
+      <td class="period">${d.period}</td>
+      <td>${fmtM(d.value)}</td>
+      <td><span class="${diffCls}">${fmtE(d.diff)}</span></td>
+      <td><span class="${diffCls}">${pctStr}</span></td>
+      <td style="color:var(--muted);font-size:.7rem">${accStr}</td>
+    </tr>`;
+  }).join('');
+}
+
+function drawEmissaoChart(id, data) {
+  const canvas = document.getElementById(id);
+  const dpr = window.devicePixelRatio||1;
+  const W = canvas.offsetWidth||340, H = 180;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+
+  const diffs = data.map(d=>d.diff/1000); // to billions
+  const maxAbs = Math.max(...diffs.map(Math.abs))||1;
+  const pad={t:10,r:6,b:28,l:6};
+  const W2=W-pad.l-pad.r, H2=H-pad.t-pad.b;
+  const barW = Math.max(2, W2/diffs.length - 1.5);
+  const mid = pad.t + H2/2;
+
+  // zero line
+  ctx.strokeStyle='rgba(255,255,255,.15)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad.l,mid); ctx.lineTo(pad.l+W2,mid); ctx.stroke();
+
+  // grid
+  ctx.strokeStyle='rgba(255,255,255,.04)'; ctx.lineWidth=1;
+  [.25,.75].forEach(f=>{
+    const y=pad.t+f*H2;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+W2,y); ctx.stroke();
+  });
+
+  diffs.forEach((v,i)=>{
+    const x = pad.l + (i/(diffs.length))*W2 + (W2/diffs.length - barW)/2;
+    const barH = (Math.abs(v)/maxAbs)*(H2/2)*0.92;
+    const isPos = v>=0;
+    const y = isPos ? mid-barH : mid;
+    const color = isPos ? '#f05050' : '#50d080'; // red=expansion, green=contraction
+    ctx.fillStyle = color+'cc';
+    ctx.fillRect(x, y, barW, barH);
+  });
+
+  // x labels
+  ctx.fillStyle='#5c6070';
+  ctx.font=`${8.5}px Syne,sans-serif`;
+  ctx.textAlign='center';
+  const step=Math.max(1,Math.floor(data.length/6));
+  for(let i=0;i<data.length;i+=step){
+    ctx.fillText(data[i].period.slice(0,7), pad.l+(i+.5)*(W2/data.length), H-5);
+  }
+  ctx.fillText(data[data.length-1].period.slice(0,7), pad.l+(data.length-.5)*(W2/data.length), H-5);
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+window.addEventListener('load',()=>{
+  loadAll();
+  window.addEventListener('resize',()=>{ if(loaded) setTimeout(renderChart,50); });
+});
+</script>
+</body>
+</html>
