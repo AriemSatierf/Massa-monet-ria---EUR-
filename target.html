@@ -152,12 +152,16 @@ canvas{display:block;width:100%!important}
     </div>
     <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
       <a href="index.html" style="font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;border:1px solid var(--border2);padding:.3rem .7rem;border-radius:4px;white-space:nowrap">← M1·M2·M3</a>
-      <a href="paises.html" style="font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;border:1px solid var(--border2);padding:.3rem .7rem;border-radius:4px;white-space:nowrap">€ Países</a>
       <button class="btn" id="btn-refresh" onclick="loadAll()">↻ Atualizar</button>
     </div>
   </div>
 </div>
 
+  <div class="status">
+    <div class="dot loading" id="status-dot"></div>
+    <span id="status-text">A carregar dados do BCE…</span>
+  </div>
+  
 <!-- ═══ EXPLAINER ═══ -->
 <div class="explainer">
   <div class="explainer-toggle" onclick="toggleExplainer()">
@@ -218,23 +222,6 @@ canvas{display:block;width:100%!important}
   </div>
 </div>
 
-<!-- ═══ MAIN ═══ -->
-<div class="main">
-
-  <div class="period-row">
-    <span class="period-label">Período:</span>
-    <select id="sel-period" onchange="renderAll()">
-      <option value="latest" selected>Mais recente</option>
-    </select>
-    <span class="period-label" style="margin-left:.5rem">Evolução:</span>
-    <select id="sel-range" onchange="renderEvo()">
-      <option value="36">3 anos</option>
-      <option value="60" selected>5 anos</option>
-      <option value="120">10 anos</option>
-      <option value="999">Tudo</option>
-    </select>
-  </div>
-
   <!-- Summary cards -->
   <div class="summary-grid" id="summary-grid">
     <div class="scard"><div class="scard-label">Maior credor</div><div class="scard-val skel" style="height:1.8rem;width:60%"></div></div>
@@ -245,7 +232,7 @@ canvas{display:block;width:100%!important}
 
   <!-- Bar chart -->
   <div class="chart-wrap">
-    <div class="chart-title">Saldo TARGET por país · milhões €</div>
+    <div class="chart-title">Saldo TARGET por país · Milhões €</div>
     <canvas id="bar-chart" height="320"></canvas>
     <div class="tip" id="bar-tip"></div>
   </div>
@@ -262,6 +249,23 @@ canvas{display:block;width:100%!important}
     <div id="rank-list"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
   </div>
 
+  <!-- ═══ MAIN ═══ -->
+<div class="main">
+
+  <div class="period-row">
+    <span class="period-label">Período:</span>
+    <select id="sel-period" onchange="renderAll()">
+      <option value="latest" selected>Mais recente</option>
+    </select>
+    <span class="period-label" style="margin-left:.5rem">Evolução:</span>
+    <select id="sel-range" onchange="renderEvo()">
+      <option value="36">3 anos</option>
+      <option value="60" selected>5 anos</option>
+      <option value="120">10 anos</option>
+      <option value="999">Tudo</option>
+    </select>
+  </div>
+
   <!-- Evolução -->
   <div class="evo-section">
     <div class="evo-header">
@@ -272,11 +276,6 @@ canvas{display:block;width:100%!important}
       <canvas id="evo-chart" height="280"></canvas>
       <div class="tip" id="evo-tip"></div>
     </div>
-  </div>
-
-  <div class="status">
-    <div class="dot loading" id="status-dot"></div>
-    <span id="status-text">A carregar dados do BCE…</span>
   </div>
 
   <div class="footnote">
