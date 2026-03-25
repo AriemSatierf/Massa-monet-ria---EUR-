@@ -385,6 +385,11 @@ select{
 <!-- ══ DASHBOARD ══ -->
 <div class="section active" id="tab-dashboard">
 
+  <div class="status">
+    <div class="dot" id="dot-dash"></div>
+    <span id="status-dash">A carregar dados…</span>
+  </div>
+  
   <!-- Nota explicativa agregados -->
   <div class="card" style="position:relative;border-color:var(--border2)">
     <div class="card-label" style="display:flex;align-items:center;gap:.3rem">
@@ -476,10 +481,6 @@ select{
     <div style="font-size:.62rem;color:var(--muted);margin-top:.3rem" id="d-exp5-sub"></div>
   </div>
 
-  <div class="status">
-    <div class="dot" id="dot-dash"></div>
-    <span id="status-dash">A carregar dados…</span>
-  </div>
   <div class="footnote">
     Fonte: BCE SDMX API · M1 série BSI/M.U2.Y.V.M10 · M2 série BSI/M.U2.Y.V.M20 · M3 série BSI/M.U2.Y.V.M30 ·
     Expansão monetária = crescimento percentual da base monetária, proxy para inflação potencial.
