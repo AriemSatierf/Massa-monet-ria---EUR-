@@ -1221,7 +1221,7 @@ function calcInflation() {
 
   document.getElementById('i-result-explain').innerHTML=`
     Os teus <strong>${fmt(amount)} €</strong> de <strong>${pF}</strong> valem apenas <strong>${fmt(realValue)} €</strong> em poder de compra real em <strong>${pT}</strong>,
-    porque a massa monetária (${agg.toUpperCase()}) expandiu <strong>+${lostPct.toFixed(1)}%</strong> ao longo de ${years} anos (${months} meses).<br><br>
+    porque a massa monetária (${agg.toUpperCase()}) expandiu <strong>+${lostPct.toFixed(2)}%</strong> ao longo de ${years} anos (${months} meses).<br><br>
     <strong style="color:var(--red)">Perda de poder de compra: −${fmt(lost)} €</strong><br><br>
     <span style="color:var(--muted)">Em alternativa: para manteres o mesmo poder de compra de ${pF}, precisarias de <strong style="color:var(--text)">${fmt(costEquivalent)} €</strong> em ${pT}.</span><br><br>
     Taxa de desvalorização anualizada: <strong>−${annualized.toFixed(2)}%/ano</strong> · expansão monetária total: <strong>×${expansion.toFixed(3)}</strong>
