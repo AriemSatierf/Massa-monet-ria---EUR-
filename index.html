@@ -871,7 +871,7 @@ DATA.m3 = DATA.m3_full.filter(d => d.period >= START_REAL);
     loaded = true;
     renderDashboard();
     populateSelects();
-    setStatus('live', `Zona euro real · ${DATA.m2[0].period} → ${DATA.m2[DATA.m2.length-1].period}`);
+    setStatus('live', `Atualizado · ${DATA.m2[0].period} → ${DATA.m2[DATA.m2.length-1].period}`);
   } catch(e) {
     setStatus('err', 'Erro: ' + e.message + ' — tente fora do claude.ai');
   } finally {
