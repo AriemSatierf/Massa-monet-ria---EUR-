@@ -350,13 +350,7 @@ canvas{display:block;width:100%!important}
     <select id="sel-period" onchange="renderAll()">
       <option value="latest" selected>Mais recente</option>
     </select>
-    <span class="period-label" style="margin-left:.5rem">Evolução:</span>
-    <select id="sel-range" onchange="renderEvo()">
-      <option value="36">3 anos</option>
-      <option value="60" selected>5 anos</option>
-      <option value="120">10 anos</option>
-      <option value="999">Tudo</option>
-    </select>
+    
   </div>
 
   <!-- Summary cards -->
@@ -391,14 +385,15 @@ canvas{display:block;width:100%!important}
 
   </div><!-- /desktop-cols -->
 
-
-<span class="period-label" style="margin-left:.5rem">Evolução:</span>
-    <select id="sel-range" onchange="renderEvo()">
+  <div class="period-row">
+    <span class="period-label" style="margin-left:.5rem">Evolução:</span>
+      <select id="sel-range" onchange="renderEvo()">
       <option value="36">3 anos</option>
       <option value="60" selected>5 anos</option>
       <option value="120">10 anos</option>
       <option value="999">Tudo</option>
     </select>
+   </div>
   
   <!-- Evolução -->
   <div class="evo-section">
