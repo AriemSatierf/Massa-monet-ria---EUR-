@@ -483,6 +483,7 @@ select{
     Fonte: BCE SDMX API · M1 série BSI/M.U2.Y.V.M10 · M2 série BSI/M.U2.Y.V.M20 · M3 série BSI/M.U2.Y.V.M30 ·
     Expansão monetária = crescimento percentual da base monetária, proxy para inflação potencial.
     Valores em Milhões de euros (M€). Nota: 1 000 000 M€ equivale a 1 Bilião (escala europeia).
+    Dados a partir de 1999 (início da zona euro real). Dados anteriores excluídos.
   </div>
 </div>
 
@@ -853,16 +854,24 @@ async function loadAll() {
     setStatus('loading', 'A carregar M3…');
     const rawM3 = await fetchEcb(BCE_M3);
 
-    DATA.m1 = parseEcbJson(rawM1);
-    DATA.m2 = parseEcbJson(rawM2);
-    DATA.m3 = parseEcbJson(rawM3);
+    const START_REAL = '1999-01';
+
+// guardar tudo (histórico completo)
+DATA.m1_full = parseEcbJson(rawM1);
+DATA.m2_full = parseEcbJson(rawM2);
+DATA.m3_full = parseEcbJson(rawM3);
+
+// usar apenas zona euro real por defeito
+DATA.m1 = DATA.m1_full.filter(d => d.period >= START_REAL);
+DATA.m2 = DATA.m2_full.filter(d => d.period >= START_REAL);
+DATA.m3 = DATA.m3_full.filter(d => d.period >= START_REAL);
 
     if(!DATA.m2.length || !DATA.m3.length) throw new Error('Dados vazios');
 
     loaded = true;
     renderDashboard();
     populateSelects();
-    setStatus('live', `Atualizado · ${DATA.m2[0].period} → ${DATA.m2[DATA.m2.length-1].period}`);
+    setStatus('live', `Zona euro real · ${DATA.m2[0].period} → ${DATA.m2[DATA.m2.length-1].period}`);
   } catch(e) {
     setStatus('err', 'Erro: ' + e.message + ' — tente fora do claude.ai');
   } finally {
