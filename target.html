@@ -366,7 +366,7 @@ canvas{display:block;width:100%!important}
 
   <!-- Bar chart -->
   <div class="chart-wrap">
-    <div class="chart-title">Saldo TARGET por país · Milhões €</div>
+    <div class="chart-title">Saldo TARGET por país · MM € (Mil Milhões) </div>
     <canvas id="bar-chart" height="320"></canvas>
     <div class="tip" id="bar-tip"></div>
   </div>
@@ -409,7 +409,7 @@ canvas{display:block;width:100%!important}
 
   <div class="footnote">
     Fonte: BCE SDMX API · Dataset TGB (Target Balances) · Série <code>M.{CC}.N.A094T.U2.EUR.E</code> ·
-    Saldo líquido (créditos menos débitos) do banco central nacional face ao BCE · Fim de mês · Unidade: milhões €.<br>
+    Saldo líquido (créditos menos débitos) do banco central nacional face ao BCE · Fim de mês · Unidade: mil milhões €.<br>
     Os saldos TARGET reflectem fluxos monetários acumulados — exportações, importações de capital, QE e política monetária.
     Não são dívidas directas entre países. <a href="https://www.ecb.europa.eu/ecb/educational/explainers/tell-me-more/html/target2_balances.en.html" target="_blank">Mais informação no BCE →</a>
   </div>
@@ -454,7 +454,7 @@ let PERIODS = [];
 let loaded = false;
 let selectedEvo = ['DE','IT','ES','FR','PT'];
 
-const fmtB  = v => { const b=v/1000; return (b>=0?'+':'')+new Intl.NumberFormat('pt-PT',{minimumFractionDigits:1,maximumFractionDigits:1}).format(b)+' M€'; };
+const fmtB  = v => { const b=v/1000; return (b>=0?'+':'')+new Intl.NumberFormat('pt-PT',{minimumFractionDigits:1,maximumFractionDigits:1}).format(b)+' MM€'; };
 const fmtBn = v => { const b=v/1000; return (b>=0?'+':'')+b.toFixed(1); };
 const fmtM  = v => (v>=0?'+':'')+new Intl.NumberFormat('pt-PT',{minimumFractionDigits:0,maximumFractionDigits:0}).format(v);
 const getC  = code => COUNTRIES.find(c=>c.code===code);
